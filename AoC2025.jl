@@ -6,8 +6,8 @@ function get_input(day_number::Int)::String
     return "./input/$(day_number).txt"
 end
 
-function day01(path=nothing)
-    if isnothing(path)
+function day01(path="")
+    if length(path)==0
         path = get_input(1)
     end
     fxn_dict = Dict('L'=>Base.:-, 'R'=>Base.:+)
@@ -42,9 +42,9 @@ function day01(path=nothing)
     return part1, part2
 end
 
-function day02(path=nothing)
+function day02(path::String="")
     part1 = 0
-    if isnothing(path)
+    if length(path)==0
         path = get_input(2)
     end
     ranges = [parse.(Int, x) for x in split.(split(readline(path), ","), "-")]
@@ -87,6 +87,41 @@ function day02(path=nothing)
     end
 
     return part1, part2
+end
+
+function day03(path::String="")
+    if length(path)==0
+        path = get_input(3)
+    end
+
+    function helper!(out, digits, target_depth)
+        if target_depth==1
+            push!(out, maximum(digits))
+            return
+        end
+        idx = argmax(digits[1:end-target_depth+1])
+        rest = digits[idx+1:end]
+        push!(out, digits[idx])
+        helper!(out, rest, target_depth-1)
+    end
+
+    part1 = 0
+    for line in readlines(path)
+        digits = parse.(Int, split(line, ""))
+        out = Int[]
+        helper!(out, digits, 2)
+        part1 += sum(out .* [10^x for x in reverse(0:1)])
+    end
+
+    part2 = 0
+    for line in readlines(path)
+        digits = parse.(Int, split(line, ""))
+        out = Int[]
+        helper!(out, digits, 12)
+        part2 += sum(out .* [10^x for x in reverse(0:11)])
+    end
+    return part1, part2
+
 end
 
 end # AoC2025
