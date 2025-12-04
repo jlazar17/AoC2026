@@ -121,7 +121,53 @@ function day03(path::String="")
         part2 += sum(out .* [10^x for x in reverse(0:11)])
     end
     return part1, part2
+end
 
+function day04(path::String="")
+    if length(path)==0
+        path = get_input(4)
+    end
+    input = [split(line, "") for line in readlines(path)]
+
+    function helper!(mat, res)
+        tot = 0
+        m, n = length(mat), length(first(mat))
+        change_pts = Tuple{Int, Int}[]
+        for idx in 1:m for jdx in 1:n
+            ctr = 0
+            if input[idx][jdx]!="@"
+                continue
+            end
+            for (a, b) in [(x, y) for x in -1:1 for y in -1:1]
+                if a==0 && b==0
+                    continue
+                end
+                try
+                    x = input[idx + a][jdx + b]
+                    ctr += x =="@" ? 1 : 0
+                catch
+                    continue
+                end
+            end
+            if ctr < 4
+                tot += 1
+                push!(change_pts, (idx, jdx))
+            end
+        end end
+        if tot > 0
+            for (idx, jdx) in change_pts
+                mat[idx][jdx] = "."
+            end
+            push!(res, tot)
+            helper!(mat, res)
+        else
+            return res
+        end
+    end
+    res = []
+    helper!(input, res)
+
+    return res[1], sum(res)
 end
 
 end # AoC2025
